@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Numerics;
+using System.Collections.Generic;
+using System.Linq;
 using Raylib_cs;
 using R = Raylib_cs.Raylib;
 
@@ -23,9 +25,12 @@ R.SetTargetFPS(60);
 
 Texture2D playerTexture = PlayerImage.LoadPlayerImage(playerWidth, playerHeight);
 
+List<Rectangle> platform = new List<Rectangle>();
+
 Rectangle playerRect = new Rectangle(playerStartingPos[0], playerStartingPos[1], playerWidth, playerHeight);
 Rectangle platformRect = new Rectangle(600, 550, 100, 20);
 
+platform.add(platformRect);
 while (!R.WindowShouldClose())
 {
     R.BeginDrawing();
@@ -77,11 +82,18 @@ while (!R.WindowShouldClose())
         accel = PlayerMovemnt.Gravity(accel).Item2;
 
         playerRect.y += yMovement.Y;
-        if (R.CheckCollisionRecs(playerRect, platformRect))
+    }
+    if (R.CheckCollisionRecs(playerRect, platformRect))
+    {
+        while (R.CheckCollisionRecs(playerRect, platformRect))
         {
-            playerRect.y -= yMovement.Y;
-            onPlatform = true;  
+            playerRect.y -= 1;
         }
+        onPlatform = true;
+    }
+    else
+    {
+        onPlatform = false;
     }
 }
 
