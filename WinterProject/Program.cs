@@ -25,12 +25,13 @@ R.SetTargetFPS(60);
 
 Texture2D playerTexture = PlayerImage.LoadPlayerImage(playerWidth, playerHeight);
 
-List<Rectangle> platform = new List<Rectangle>();
+List<Rectangle> platforms = new List<Rectangle>();
 
 Rectangle playerRect = new Rectangle(playerStartingPos[0], playerStartingPos[1], playerWidth, playerHeight);
 Rectangle platformRect = new Rectangle(600, 550, 100, 20);
 
-platform.add(platformRect);
+platforms.Add(platformRect);
+
 while (!R.WindowShouldClose())
 {
     R.BeginDrawing();
@@ -41,35 +42,38 @@ while (!R.WindowShouldClose())
 
     R.EndDrawing();
 
+    Console.WriteLine(platforms);
+
     Vector2 xMovement = PlayerMovemnt.HorizontalMovement(playerSpeed);
     playerRect.x += xMovement.X;
-    if (R.CheckCollisionRecs(playerRect, platformRect))
+
+    foreach (var item in platforms)
     {
-        playerRect.x -= xMovement.X;
+        if (R.CheckCollisionRecs(playerRect, item))
+        {
+            playerRect.x -= xMovement.X;
+        }
     }
 
-    Vector2 yMovement = PlayerMovemnt.UpwardMovement(onFloor, jumpInt, playerSpeed).Item1;
+    (Vector2, int) upWardMovementTuple = PlayerMovemnt.UpwardMovement(onFloor, jumpInt, playerSpeed);
+
+    Vector2 yMovement = upWardMovementTuple.Item1;
+    jumpInt = upWardMovementTuple.Item2;
+
     playerRect.y += yMovement.Y;
-    if (R.CheckCollisionRecs(playerRect, platformRect))
+
+    foreach (var item in platforms)
     {
-        playerRect.y -= yMovement.Y;
+        if (R.CheckCollisionRecs(playerRect, item))
+        {
+            playerRect.y -= yMovement.Y;
+        }
     }
 
-    jumpInt = PlayerMovemnt.UpwardMovement(onFloor, jumpInt, playerSpeed).Item2;
+    (Rectangle, bool) ifOnFloorTuple = Check.IfOnFloor(playerRect, playerHeight, onFloor, onPlatform);
 
-    if (playerRect.y > 600 - playerHeight)
-    {
-        playerRect.y = 600 - playerHeight;
-        onFloor = true;
-    }
-    else if (onPlatform)
-    {
-        onFloor = true;
-    }
-    else
-    {
-        onFloor = false;
-    }
+    playerRect = ifOnFloorTuple.Item1;
+    onFloor = ifOnFloorTuple.Item2;
 
     if (onFloor)
     {
@@ -78,22 +82,27 @@ while (!R.WindowShouldClose())
     }
     else
     {
-        yMovement = PlayerMovemnt.Gravity(accel).Item1;
-        accel = PlayerMovemnt.Gravity(accel).Item2;
+        (Vector2, float) gravityTuple = PlayerMovemnt.Gravity(accel);
+        yMovement = gravityTuple.Item1;
+        accel = gravityTuple.Item2;
 
         playerRect.y += yMovement.Y;
     }
-    if (R.CheckCollisionRecs(playerRect, platformRect))
+
+    foreach (var item in platforms)
     {
-        while (R.CheckCollisionRecs(playerRect, platformRect))
+        if (R.CheckCollisionRecs(playerRect, item))
         {
-            playerRect.y -= 1;
+            while (R.CheckCollisionRecs(playerRect, item))
+            {
+                playerRect.y -= 1;
+            }
+            onPlatform = true;
         }
-        onPlatform = true;
-    }
-    else
-    {
-        onPlatform = false;
+        else
+        {
+            onPlatform = false;
+        }
     }
 }
 

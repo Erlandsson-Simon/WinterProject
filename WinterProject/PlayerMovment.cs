@@ -39,7 +39,9 @@ class PlayerMovemnt
             movement.Y = -playerSpeed;
         }
 
-        return (movement, jumpInt);
+        (Vector2, int) a = (movement, jumpInt);
+
+        return a;
     }
 
 
@@ -50,6 +52,8 @@ class PlayerMovemnt
         movement.Y = accel;
         accel += 0.15f;
 
-        return (movement, accel);
+        (Vector2, float) a = (movement, accel);
+
+        return a;
     }
 }
