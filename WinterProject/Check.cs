@@ -6,9 +6,9 @@ class Check
 {
     public static (Rectangle, bool) IfOnFloor(Rectangle playerRect, int playerHeight, bool onFloor, bool onPlatform)
     {
-        if (playerRect.y > 600 - playerHeight)
+        if (playerRect.y > R.GetScreenHeight() - playerHeight)
         {
-            playerRect.y = 600 - playerHeight;
+            playerRect.y = R.GetScreenHeight() - playerHeight;
             onFloor = true;
         }
         else if (onPlatform)

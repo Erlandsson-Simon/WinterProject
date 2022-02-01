@@ -6,40 +6,43 @@ using R = Raylib_cs.Raylib;
 class PlayerMovemnt
 {
 
-    public static Vector2 HorizontalMovement(float playerSpeed)
+    public static (Vector2, Texture2D) HorizontalMovement(float playerSpeed, Texture2D playerTextureRight, Texture2D playerTextureLeft, Texture2D playerTexture)
     {
         Vector2 movement = new Vector2();
 
         if (Raylib.IsKeyDown(KeyboardKey.KEY_D))
         {
             movement.X = playerSpeed;
+            playerTexture = playerTextureRight;
         }
 
         if (Raylib.IsKeyDown(KeyboardKey.KEY_A))
         {
             movement.X = -playerSpeed;
+            playerTexture = playerTextureLeft;
         }
 
-        return movement;
+        (Vector2, Texture2D) a = new (movement, playerTexture);
+
+        return a;
 
     }
 
-    public static (Vector2, int) UpwardMovement(bool onFloor, int jumpInt, float playerSpeed)
+    public static (Vector2, bool) UpwardMovement(bool onFloor, bool jumpBool, float playerSpeed)
     {
         Vector2 movement = new Vector2();
 
         if (Raylib.IsKeyDown(KeyboardKey.KEY_W))
         {
-            jumpInt = 0;
+            jumpBool = true;
         }
 
-        if (jumpInt < 100)
+        if (jumpBool)
         {
-            jumpInt += 1;
             movement.Y = -playerSpeed;
         }
 
-        (Vector2, int) a = (movement, jumpInt);
+        (Vector2, bool) a = (movement, jumpBool);
 
         return a;
     }
