@@ -53,7 +53,7 @@ class PlayerMovemnt
         Vector2 movement = new Vector2();
 
         movement.Y = accel;
-        accel += 0.15f;
+        accel += 0.25f;
 
         (Vector2, float) a = (movement, accel);
 

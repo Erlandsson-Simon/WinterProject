@@ -40,7 +40,11 @@ Rectangle playerRect = new Rectangle(playerStartingPos[0], playerStartingPos[1],
 
 Rectangle earthRect = new Rectangle(0, 880, screenWidth, 300);
 platforms.Add(earthRect);
+
 Rectangle skyRect = new Rectangle(0, 0, screenWidth, 880);
+
+Rectangle rightWall = new Rectangle(-1000, 0, 1000, screenHeight);
+// platforms.Add(rightWall);
 
 Camera2D camera = new Camera2D();
 camera.target = new Vector2(screenWidth / 2, screenHeight / 2);
@@ -58,6 +62,7 @@ while (!R.WindowShouldClose())
 
     R.DrawRectangleRec(earthRect, Color.GREEN);
     R.DrawRectangleRec(skyRect, Color.SKYBLUE);
+    R.DrawRectangleRec(rightWall, Color.GREEN);
 
     R.DrawTexture(playerTexture, (int)playerRect.x, (int)playerRect.y, playerColor);
 
