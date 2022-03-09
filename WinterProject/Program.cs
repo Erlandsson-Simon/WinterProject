@@ -7,7 +7,7 @@ using R = Raylib_cs.Raylib;
 
 string gameName = "MugArm";
 
-float playerSpeed = 10f;
+float playerSpeed = 15f;
 int playerWidth = 50;
 int playerHeight = 50;
 int[] playerStartingPos = new int[] { 960, 540 };
@@ -17,6 +17,10 @@ bool jumpBool = false;
 
 bool onFloor = false;
 bool onPlatform = false;
+
+int health = 3;
+int heartX = 1650;
+int heartY = 75;
 
 Color playerColor = Color.WHITE;
 
@@ -34,17 +38,27 @@ Texture2D playerTextureRight = playerTextureTuple.Item3;
 
 Texture2D playerTexture = playerTextureNormal;
 
+Image heartImage = R.LoadImage("Images/heartImage.png");
+R.ImageResize(ref heartImage, 50, 50);
+Texture2D heartTexture = R.LoadTextureFromImage(heartImage);
+
 List<Rectangle> platforms = new List<Rectangle>();
+List<Rectangle> walls = new List<Rectangle>();
 
 Rectangle playerRect = new Rectangle(playerStartingPos[0], playerStartingPos[1], playerWidth, playerHeight);
 
-Rectangle earthRect = new Rectangle(0, 880, screenWidth, 300);
+Rectangle earthRect = new Rectangle(0, 880, screenWidth * 2, 300);
 platforms.Add(earthRect);
 
-Rectangle skyRect = new Rectangle(0, 0, screenWidth, 880);
+Rectangle skyRect = new Rectangle(0, 0, screenWidth * 2, 880);
 
-Rectangle rightWall = new Rectangle(-1000, 0, 1000, screenHeight);
-// platforms.Add(rightWall);
+Rectangle leftWall = new Rectangle(-1000, 0, 1000, screenHeight);
+walls.Add(leftWall);
+
+Rectangle platformOne = new Rectangle(600, screenHeight - 450, 150, 25);
+platforms.Add(platformOne);
+
+List<Bullet> bullets = new List<Bullet>();
 
 Camera2D camera = new Camera2D();
 camera.target = new Vector2(screenWidth / 2, screenHeight / 2);
@@ -54,20 +68,34 @@ camera.offset = new Vector2(screenWidth / 2, screenHeight / 2);
 while (!R.WindowShouldClose())
 {
     R.BeginDrawing();
-    // hälsobar etc
-
     R.BeginMode2D(camera);
 
     R.ClearBackground(Color.WHITE);
 
     R.DrawRectangleRec(earthRect, Color.GREEN);
     R.DrawRectangleRec(skyRect, Color.SKYBLUE);
-    R.DrawRectangleRec(rightWall, Color.GREEN);
+    R.DrawRectangleRec(leftWall, Color.GREEN);
+    R.DrawRectangleRec(platformOne, Color.BLACK);
 
     R.DrawTexture(playerTexture, (int)playerRect.x, (int)playerRect.y, playerColor);
 
+    foreach (Bullet b in bullets)
+    {
+        b.Draw();
+        b.Update();
+    }
+
     R.EndMode2D();
+
+    for (var i = 0; i < health; i++)
+    {
+        R.DrawTexture(heartTexture, heartX, heartY, Color.WHITE);
+        heartX += 75;
+    }
+
     R.EndDrawing();
+
+    heartX = 1650;
 
     playerTexture = playerTextureNormal;
 
@@ -88,7 +116,16 @@ while (!R.WindowShouldClose())
         }
     }
 
-    (Vector2, bool) upWardMovementTuple = PlayerMovemnt.UpwardMovement(onFloor, jumpBool, playerSpeed);
+    foreach (var item in walls)
+    {
+        if (R.CheckCollisionRecs(playerRect, item))
+        {
+            playerRect.x -= xMovement.X;
+            camera.target.X -= xMovement.X;
+        }
+    }
+
+    (Vector2, bool) upWardMovementTuple = PlayerMovemnt.UpwardMovement(onFloor, jumpBool, playerSpeed, onPlatform);
 
     Vector2 yMovement = upWardMovementTuple.Item1;
     jumpBool = upWardMovementTuple.Item2;
@@ -100,6 +137,7 @@ while (!R.WindowShouldClose())
         if (R.CheckCollisionRecs(playerRect, item))
         {
             playerRect.y -= yMovement.Y;
+            jumpBool = false;
         }
     }
 
@@ -111,7 +149,7 @@ while (!R.WindowShouldClose())
     if (onFloor)
     {
         accel = 0;
-        jumpBool = false;
+        // jumpBool = false;
     }
     else
     {
@@ -122,19 +160,31 @@ while (!R.WindowShouldClose())
         playerRect.y += yMovement.Y;
     }
 
+    if (R.CheckCollisionRecs(playerRect, earthRect))
+    {
+        playerRect.y = earthRect.y - playerHeight;
+
+        onPlatform = true;
+        jumpBool = false;
+    }
+    else
+    {
+        onPlatform = false;
+    }
+
     foreach (var item in platforms)
     {
         if (R.CheckCollisionRecs(playerRect, item))
         {
             playerRect.y = item.y - playerHeight;
-
-            onPlatform = true;
+            accel = 0;
             jumpBool = false;
         }
-        else
-        {
-            onPlatform = false;
-        }
+    }
+
+    if (Raylib.IsKeyDown(KeyboardKey.KEY_SPACE))
+    {
+        bullets.Add(new Bullet() { position = new Vector2(playerRect.x + playerWidth, playerRect.y + playerHeight/2) });
     }
 }
 

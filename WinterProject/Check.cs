@@ -24,4 +24,23 @@ class Check
         return a;
     }
 
+    // public static void platformCollition()
+    // {
+    //     (Vector2, bool) upWardMovementTuple = PlayerMovemnt.UpwardMovement(onFloor, jumpBool, playerSpeed, onPlatform);
+
+    //     Vector2 yMovement = upWardMovementTuple.Item1;
+    //     jumpBool = upWardMovementTuple.Item2;
+
+    //     playerRect.y += yMovement.Y;
+
+    //     foreach (var item in platforms)
+    //     {
+    //         if (R.CheckCollisionRecs(playerRect, item))
+    //         {
+    //             playerRect.y -= yMovement.Y;
+    //             jumpBool = false;
+    //         }
+    //     }
+    // }
+
 }

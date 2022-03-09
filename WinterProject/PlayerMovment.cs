@@ -22,17 +22,17 @@ class PlayerMovemnt
             playerTexture = playerTextureLeft;
         }
 
-        (Vector2, Texture2D) a = new (movement, playerTexture);
+        (Vector2, Texture2D) a = new(movement, playerTexture);
 
         return a;
 
     }
 
-    public static (Vector2, bool) UpwardMovement(bool onFloor, bool jumpBool, float playerSpeed)
+    public static (Vector2, bool) UpwardMovement(bool onFloor, bool jumpBool, float playerSpeed, bool onPlatform)
     {
         Vector2 movement = new Vector2();
 
-        if (Raylib.IsKeyDown(KeyboardKey.KEY_W))
+        if (Raylib.IsKeyDown(KeyboardKey.KEY_W) && onPlatform == true)
         {
             jumpBool = true;
         }
@@ -53,7 +53,7 @@ class PlayerMovemnt
         Vector2 movement = new Vector2();
 
         movement.Y = accel;
-        accel += 0.25f;
+        accel += 0.35f;
 
         (Vector2, float) a = (movement, accel);
 
